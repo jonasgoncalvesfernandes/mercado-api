@@ -1,0 +1,12 @@
+rodar container com mysql 
+
+docker-compose up -d
+
+parrar container docker compose down
+
+
+2️⃣ Subir o Spring Boot
+
+Na mesma pasta do projeto:
+
+./gradlew bootRun
