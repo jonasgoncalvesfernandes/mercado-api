@@ -17,7 +17,7 @@ public class Produto {
     @Column(nullable = false) // Define que a coluna 'nome' não pode ser nula (obrigatória)
     private String nome;
 
-    @Column(unique = true) // Garante que não haverá dois produtos com o mesmo código de barras
+    @Column(unique = true, nullable = false) // Garante que não haverá dois produtos com o mesmo código de barras
     private String codigoBarras;
 
     @Column(nullable = false) // O preço é obrigatório

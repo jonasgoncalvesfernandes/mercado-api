@@ -58,4 +58,15 @@ public class ProdutoController {
 
         return ResponseEntity.noContent().build();
     }
+    
+    // READ - buscar por código de barras (PDV / scanner)
+    @GetMapping("/codigo/{codigoBarras}")
+    public ResponseEntity<Produto> buscarPorCodigoBarras(
+            @PathVariable String codigoBarras
+    ) {
+        return produtoService.buscarPorCodigoBarras(codigoBarras)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
