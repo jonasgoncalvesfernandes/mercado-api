@@ -21,4 +21,9 @@ public class VendaController {
     public ResponseEntity<Venda> criarVenda(@RequestBody VendaRequest request) {
         return ResponseEntity.ok(vendaService.criarVenda(request));
     }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<Venda>> listarVendas() {
+        return ResponseEntity.ok(vendaService.listarVendas());
+    }
 }

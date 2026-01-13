@@ -70,5 +70,10 @@ public Venda criarVenda(VendaRequest request) {
 
     return vendaRepository.save(venda);
 }
+
+@Override
+public List<Venda> listarVendas() {
+    return vendaRepository.findAll();
+}
 }
 
