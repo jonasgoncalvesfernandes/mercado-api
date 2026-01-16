@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.ArrayList;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -27,7 +28,7 @@ public class VendaServiceImpl implements VendaService {
 
 @Transactional
 @Override
-public Venda criarVenda(VendaRequest request) {
+public VendaResponse criarVenda(VendaRequest request) {
 
     Venda venda = new Venda();
     venda.setDataHora(LocalDateTime.now());
@@ -68,12 +69,55 @@ public Venda criarVenda(VendaRequest request) {
     venda.setItens(itens);
     venda.setValorTotal(total);
 
-    return vendaRepository.save(venda);
+    Venda vendaSalva = vendaRepository.save(venda);
+    return toResponse(vendaSalva);
 }
 
 @Override
-public List<Venda> listarVendas() {
-    return vendaRepository.findAll();
+public List<VendaResponse> listarVendas() {
+    return vendaRepository.findAll()
+            .stream()
+            .map(this::toResponse)
+            .toList();
 }
+
+
+private VendaResponse toResponse(Venda venda) {
+    VendaResponse response = new VendaResponse();
+    response.setId(venda.getId());
+    response.setDataHora(venda.getDataHora());
+    response.setValorTotal(venda.getValorTotal());
+    response.setFormaPagamento(venda.getFormaPagamento().name());
+
+    List<ItemVendaResponse> itens = venda.getItens().stream().map(item -> {
+        ItemVendaResponse itemResp = new ItemVendaResponse();
+        itemResp.setProdutoId(item.getProduto().getId());
+        itemResp.setNomeProduto(item.getProduto().getNome());
+        itemResp.setQuantidade(item.getQuantidade());
+        itemResp.setPrecoUnitario(item.getPrecoUnitario());
+        itemResp.setSubtotal(item.getSubtotal());
+        return itemResp;
+    }).toList();
+
+    response.setItens(itens);
+    return response;
+}
+
+@Override
+public List <VendaResponse> listarPorPeriodo(
+        LocalDate inicio,
+        LocalDate fim
+    
+) {
+    LocalDateTime inicioDataHora = inicio.atStartOfDay();
+    LocalDateTime fimDataHora = fim.atTime(23, 59, 59);
+
+    return vendaRepository
+            .findByDataHoraBetween(inicioDataHora, fimDataHora)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+}
+
 }
 

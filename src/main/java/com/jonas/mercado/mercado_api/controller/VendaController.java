@@ -1,10 +1,13 @@
 package com.jonas.mercado.mercado_api.controller;
 
 import com.jonas.mercado.mercado_api.dto.VendaRequest;
-import com.jonas.mercado.mercado_api.entity.Venda;
+import com.jonas.mercado.mercado_api.dto.VendaResponse;
 import com.jonas.mercado.mercado_api.service.VendaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 @RestController
@@ -18,12 +21,23 @@ public class VendaController {
     }
 
     @PostMapping
-    public ResponseEntity<Venda> criarVenda(@RequestBody VendaRequest request) {
+    public ResponseEntity<VendaResponse> criarVenda(@RequestBody VendaRequest request) {
         return ResponseEntity.ok(vendaService.criarVenda(request));
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<Venda>> listarVendas() {
+    public ResponseEntity<List<VendaResponse>> listar() {
         return ResponseEntity.ok(vendaService.listarVendas());
     }
+
+    @GetMapping("/periodo")
+    public ResponseEntity<List<VendaResponse>> listarPorPeriodo(
+            @RequestParam LocalDate inicio,
+            @RequestParam LocalDate fim
+    ) {
+        return ResponseEntity.ok(
+                vendaService.listarPorPeriodo(inicio, fim)
+        );
+    }
+
 }
