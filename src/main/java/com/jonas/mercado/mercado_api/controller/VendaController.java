@@ -1,5 +1,6 @@
 package com.jonas.mercado.mercado_api.controller;
 
+import com.jonas.mercado.mercado_api.dto.RelatorioVendasResponse;
 import com.jonas.mercado.mercado_api.dto.VendaRequest;
 import com.jonas.mercado.mercado_api.dto.VendaResponse;
 import com.jonas.mercado.mercado_api.service.VendaService;
@@ -39,5 +40,16 @@ public class VendaController {
                 vendaService.listarPorPeriodo(inicio, fim)
         );
     }
+
+    @GetMapping("/relatorio/periodo")
+    public ResponseEntity<RelatorioVendasResponse> relatorioPorPeriodo(
+            @RequestParam LocalDate inicio,
+            @RequestParam LocalDate fim
+    ) {
+        return ResponseEntity.ok(
+                vendaService.gerarRelatorio(inicio, fim)
+        );
+    }
+
 
 }

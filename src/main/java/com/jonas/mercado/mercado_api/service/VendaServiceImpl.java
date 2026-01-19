@@ -119,5 +119,41 @@ public List <VendaResponse> listarPorPeriodo(
             .toList();
 }
 
+@Override
+public RelatorioVendasResponse gerarRelatorio(
+        LocalDate inicio,
+        LocalDate fim
+) {
+    LocalDateTime inicioDataHora = inicio.atStartOfDay();
+    LocalDateTime fimDataHora = fim.atTime(23, 59, 59);
+
+    List<Venda> vendas = vendaRepository
+            .findByDataHoraBetween(inicioDataHora, fimDataHora);
+
+    BigDecimal valorTotal = vendas.stream()
+            .map(Venda::getValorTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    long totalVendas = vendas.size();
+
+    BigDecimal ticketMedio = totalVendas > 0
+            ? valorTotal.divide(
+                    BigDecimal.valueOf(totalVendas),
+                    2,
+                    BigDecimal.ROUND_HALF_UP
+              )
+            : BigDecimal.ZERO;
+
+    RelatorioVendasResponse response = new RelatorioVendasResponse();
+    response.setInicio(inicio);
+    response.setFim(fim);
+    response.setTotalVendas(totalVendas);
+    response.setValorTotal(valorTotal);
+    response.setTicketMedio(ticketMedio);
+
+    return response;
+}
+
+
 }
 
