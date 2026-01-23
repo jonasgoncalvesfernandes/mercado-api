@@ -2,6 +2,8 @@ package com.jonas.mercado.mercado_api.service;
 
 import com.jonas.mercado.mercado_api.dto.*;
 import com.jonas.mercado.mercado_api.entity.*;
+import com.jonas.mercado.mercado_api.exception.EstoqueInsuficienteException;
+import com.jonas.mercado.mercado_api.exception.ProdutoNaoEncontradoException;
 import com.jonas.mercado.mercado_api.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,10 +48,10 @@ public VendaResponse criarVenda(VendaRequest request) {
         }
 
         Produto produto = produtoRepository.findById(itemReq.getProdutoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(itemReq.getProdutoId()));
 
         if (produto.getQuantidade() < itemReq.getQuantidade()) {
-            throw new RuntimeException("Estoque insuficiente");
+                throw new EstoqueInsuficienteException(produto.getNome());
         }
 
         // baixa de estoque

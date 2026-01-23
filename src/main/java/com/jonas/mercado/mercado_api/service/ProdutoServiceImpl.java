@@ -1,6 +1,7 @@
 package com.jonas.mercado.mercado_api.service;
 
 import com.jonas.mercado.mercado_api.entity.Produto;
+import com.jonas.mercado.mercado_api.exception.ProdutoNaoEncontradoException;
 import com.jonas.mercado.mercado_api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,15 @@ public class ProdutoServiceImpl implements ProdutoService {
                 .stream()
                 .filter(Produto::getAtivo)
                 .toList();
+    }
+
+    @Override
+    public void desativar(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+
+        produto.setAtivo(false);
+        produtoRepository.save(produto);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.jonas.mercado.mercado_api.controller;
 
 import com.jonas.mercado.mercado_api.entity.Produto;
+import com.jonas.mercado.mercado_api.exception.ProdutoNaoEncontradoException;
 import com.jonas.mercado.mercado_api.service.ProdutoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +37,12 @@ public class ProdutoController {
     // READ - buscar por id
     @GetMapping("/{id}")
     public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
-        return produtoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Produto produto = produtoService.buscarPorId(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+
+        return ResponseEntity.ok(produto);
     }
+
 
     // UPDATE
     // Put para atualizar um produto existente buscando pelo ID
@@ -56,12 +59,7 @@ public class ProdutoController {
     // DELETE lógico (desativar)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable Long id) {
-        Produto produto = produtoService.buscarPorId(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
-        produto.setAtivo(false);
-        produtoService.salvar(produto);
-
+        produtoService.desativar(id);
         return ResponseEntity.noContent().build();
     }
     
