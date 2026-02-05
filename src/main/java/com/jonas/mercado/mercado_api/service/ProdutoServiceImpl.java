@@ -41,6 +41,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    //Listar ativos somente
     public List<Produto> listarAtivos() {
         return produtoRepository.findAll()
                 .stream()
@@ -54,6 +55,15 @@ public class ProdutoServiceImpl implements ProdutoService {
                 .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
 
         produto.setAtivo(false);
+        produtoRepository.save(produto);
+    }
+
+    @Override
+    public void ativar(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+
+        produto.setAtivo(true);
         produtoRepository.save(produto);
     }
 

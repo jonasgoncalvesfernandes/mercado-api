@@ -121,6 +121,7 @@ public List <VendaResponse> listarPorPeriodo(
             .toList();
 }
 
+
 @Override
 public RelatorioVendasResponse gerarRelatorio(
         LocalDate inicio,

@@ -19,7 +19,9 @@ public interface ProdutoService {
 
     List<Produto> listarAtivos();
 
-    public void desativar(Long id);
+    void desativar(Long id);
+
+    void ativar(Long id);
 
     Produto atualizar(Long id, Produto produtoAtualizado);
     

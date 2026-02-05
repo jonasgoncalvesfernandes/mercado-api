@@ -34,6 +34,12 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.listarTodos());
     }
 
+    // READ - listar todos os ativos
+    @GetMapping("/ativos")
+    public ResponseEntity<List<Produto>> listarAtivos() {
+        return ResponseEntity.ok(produtoService.listarAtivos());
+    }
+
     // READ - buscar por id
     @GetMapping("/{id}")
     public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
@@ -60,6 +66,13 @@ public class ProdutoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable Long id) {
         produtoService.desativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Ativar produto
+    @PostMapping("/{id}/ativar")
+    public ResponseEntity<Void> ativar(@PathVariable Long id) {
+        produtoService.ativar(id);
         return ResponseEntity.noContent().build();
     }
     
