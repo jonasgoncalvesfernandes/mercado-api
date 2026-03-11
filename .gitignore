@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Arquivos de Notas e Comandos ###
+enviar-post-produto.txt
+funcionamento-react.txt
+roda-container-com-mysql.txt
+rodar-react.txt
+useEffect-e-UseState.txt
