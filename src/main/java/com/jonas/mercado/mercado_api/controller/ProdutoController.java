@@ -10,7 +10,9 @@ import java.util.List;
 // Responde as requisições HTTP relacionadas a produtos
 @RestController
 // Define o caminho base para todas as rotas deste controlador, que será "/produtos"
+//a anotação @CrossOrigin para permitir requisições de um frontend rodando em http://localhost:5173, que é comum durante o desenvolvimento com frameworks como React ou Vue.js.
 @RequestMapping("/produtos")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProdutoController {
 
     private final ProdutoService produtoService;

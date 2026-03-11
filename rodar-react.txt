@@ -1,0 +1,4 @@
+rodar o react ->
+
+cd mercado-front
+ npm run dev

@@ -1,0 +1,10 @@
+enviar um post pra adicionar produtos http://localhost:8080/produtos
+
+
+{
+  "nome": "Arroz Tipo 12",
+  "codigoBarras": "789123456000d12",
+  "preco": 22.90,
+  "quantidade": 50,
+  "ativo": true
+}
