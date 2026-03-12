@@ -1,83 +1,59 @@
 package com.jonas.mercado.mercado_api.service;
 
 import com.jonas.mercado.mercado_api.entity.Produto;
+import com.jonas.mercado.mercado_api.exception.CodigoDeBarrasExistente;
 import com.jonas.mercado.mercado_api.exception.ProdutoNaoEncontradoException;
 import com.jonas.mercado.mercado_api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProdutoServiceImpl implements ProdutoService {
+    private final ProdutoRepository repo;
+    public ProdutoServiceImpl(ProdutoRepository repo) { this.repo = repo; }
 
-    private final ProdutoRepository produtoRepository;
-
-    public ProdutoServiceImpl(ProdutoRepository produtoRepository) {
-        this.produtoRepository = produtoRepository;
-    }
+    @Override public List<Produto> listarTodos()  { return repo.findAll(); }
+    @Override public List<Produto> listarAtivos()  { return repo.findByAtivoTrue(); }
+    @Override public Optional<Produto> buscarPorId(Long id) { return repo.findById(id); }
+    @Override public Optional<Produto> buscarPorCodigoBarras(String c) { return repo.findByCodigoBarras(c); }
 
     @Override
-    public Produto salvar(Produto produto) {
-        if (produtoRepository.findByCodigoBarras(produto.getCodigoBarras()).isPresent()) {
-                throw new RuntimeException("Já existe produto com esse código de barras");
-            }
-            return produtoRepository.save(produto);
+    public Produto salvar(Produto p) {
+        if (p.getCodigoBarras() != null && !p.getCodigoBarras().isBlank()) {
+            repo.findByCodigoBarras(p.getCodigoBarras())
+                .ifPresent(ex -> { throw new CodigoDeBarrasExistente(p.getCodigoBarras()); });
+        } else {
+            p.setCodigoBarras(null);
         }
-
-    @Override
-    public Optional<Produto> buscarPorCodigoBarras(String codigoBarras) {
-        return produtoRepository.findByCodigoBarras(codigoBarras);
+        return repo.save(p);
     }
 
     @Override
-    public Optional<Produto> buscarPorId(Long id) {
-        return produtoRepository.findById(id);
-    }
-
-    @Override
-    public List<Produto> listarTodos() {
-        return produtoRepository.findAll();
-    }
-
-    @Override
-    //Listar ativos somente
-    public List<Produto> listarAtivos() {
-        return produtoRepository.findAll()
-                .stream()
-                .filter(Produto::getAtivo)
-                .toList();
+    public Produto atualizar(Long id, Produto dados) {
+        Produto p = repo.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+        if (dados.getCodigoBarras() != null && !dados.getCodigoBarras().isBlank()) {
+            repo.findByCodigoBarrasAndIdNot(dados.getCodigoBarras(), id)
+                .ifPresent(ex -> { throw new CodigoDeBarrasExistente(dados.getCodigoBarras()); });
+            p.setCodigoBarras(dados.getCodigoBarras());
+        } else {
+            p.setCodigoBarras(null);
+        }
+        p.setNome(dados.getNome());
+        p.setPreco(dados.getPreco());
+        p.setQuantidade(dados.getQuantidade());
+        return repo.save(p);
     }
 
     @Override
     public void desativar(Long id) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
-
-        produto.setAtivo(false);
-        produtoRepository.save(produto);
+        Produto p = repo.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+        p.setAtivo(false); repo.save(p);
     }
 
     @Override
     public void ativar(Long id) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
-
-        produto.setAtivo(true);
-        produtoRepository.save(produto);
-    }
-
-    @Override
-    public Produto atualizar(Long id, Produto produtoAtualizado) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
-        produto.setNome(produtoAtualizado.getNome());
-        produto.setPreco(produtoAtualizado.getPreco());
-        produto.setQuantidade(produtoAtualizado.getQuantidade());
-        produto.setCodigoBarras(produtoAtualizado.getCodigoBarras());
-        produto.setAtivo(produtoAtualizado.getAtivo());
-
-        return produtoRepository.save(produto);
+        Produto p = repo.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+        p.setAtivo(true); repo.save(p);
     }
 }

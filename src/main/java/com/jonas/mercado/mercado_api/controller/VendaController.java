@@ -4,53 +4,43 @@ import com.jonas.mercado.mercado_api.dto.RelatorioVendasResponse;
 import com.jonas.mercado.mercado_api.dto.VendaRequest;
 import com.jonas.mercado.mercado_api.dto.VendaResponse;
 import com.jonas.mercado.mercado_api.service.VendaService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/vendas")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:3000","http://127.0.0.1:5173"})
 public class VendaController {
-
     private final VendaService vendaService;
-
-    public VendaController(VendaService vendaService) {
-        this.vendaService = vendaService;
-    }
+    public VendaController(VendaService vendaService) { this.vendaService = vendaService; }
 
     @PostMapping
-    public ResponseEntity<VendaResponse> criarVenda(@RequestBody VendaRequest request) {
-        return ResponseEntity.ok(vendaService.criarVenda(request));
+    public ResponseEntity<VendaResponse> criar(@RequestBody VendaRequest req) {
+        return ResponseEntity.ok(vendaService.criarVenda(req));
     }
 
     @GetMapping
-    public ResponseEntity<List<VendaResponse>> listar() {
-        return ResponseEntity.ok(vendaService.listarVendas());
+    public List<VendaResponse> listar() { return vendaService.listarVendas(); }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VendaResponse> buscar(@PathVariable Long id) {
+        return vendaService.buscarPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/periodo")
-    public ResponseEntity<List<VendaResponse>> listarPorPeriodo(
-            @RequestParam LocalDate inicio,
-            @RequestParam LocalDate fim
-    ) {
-        return ResponseEntity.ok(
-                vendaService.listarPorPeriodo(inicio, fim)
-        );
+    public List<VendaResponse> porPeriodo(
+            @RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate fim) {
+        return vendaService.listarPorPeriodo(inicio, fim);
     }
 
     @GetMapping("/relatorio/periodo")
-    public ResponseEntity<RelatorioVendasResponse> relatorioPorPeriodo(
-            @RequestParam LocalDate inicio,
-            @RequestParam LocalDate fim
-    ) {
-        return ResponseEntity.ok(
-                vendaService.gerarRelatorio(inicio, fim)
-        );
+    public RelatorioVendasResponse relatorio(
+            @RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate fim) {
+        return vendaService.gerarRelatorio(inicio, fim);
     }
-
-
 }
